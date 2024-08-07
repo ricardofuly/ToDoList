@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import messagebox
 import os
 
 tasks = []
@@ -15,56 +17,97 @@ def save_tasks():
         for task in tasks:
             file.write(task + "\n")
 
-def add_task(task):
+def add_task():
     #Add a new task to the ToDo list.
-    tasks.append(task)
-    print(f'Task "{task}" was successfuly added!')
+    task = entry_task.get()
+    if task != "":
+        tasks.append(task)
+        listbox_tasks.insert(tk.END, task)
+        save_tasks()
+        entry_task.delete(0, tk.END)
+    else:
+        messagebox.showwarning("Error", "You must add a task.")
     
-def remove_task(task):
+def remove_task():
     #Remove a task from the list.
-    if task in tasks:
-        confirmation = input(f'Are you sure do you would like to remove "{task}" ? (Y / N): ')
-        if confirmation.lower() == 'y':
-            remove_task(task)
-            print("Task Removed!")
-        else:
-            print("Action Canceled!")
-    else:
-        print(f'Task "{task}" not found!!')
+    try:
+        task_index = listbox_tasks.curselection()[0]
+        task = listbox_tasks.get(task_index)
+        if messagebox.askyesno("Confirm", f"Are you sure you would like to remove '{task}'?"):
+            tasks.remove(task)
+            listbox_tasks.delete(task_index)
+            save_tasks()
+    except IndexError:
+        messagebox.showwarning("Error", "You must to select a task!")
         
-def task_list():
-    #Show the list of tasks.
-    if tasks:
-        print("List of Tasks: ")
-        for i, task in enumerate(tasks, 1):
-            print(f"{i}. {task}")
-    else:
-        print("Task List was empty!")
+def clear_all_tasks():
+    #Remove all task from the list
+    if messagebox.askyesno("Confirm", "Are you sure you would like to remove ALL the tasks?"):
+        listbox_tasks.delete(0, tk.END)
+        tasks.clear()
+        save_tasks()
+
+def load_tasks_to_listbox():
+    #Load the tasks from the listbox
+    for task in tasks:
+        listbox_tasks.insert(tk.END, task)
         
-def show_menu():
-    #Show the options menu to the user.
-    print("\n Menu: ")
-    print("1. Add Task")
-    print("2. Remove Task")
-    print("3. List Task")
-    print("4. Exit")
-    
-while True:
-    #Main loop for the menu.
-    show_menu()
-    option = input("Choose the option: ")
-    
-    match option:
-        case "1":
-           task = input("Type a task  to be added: ")
-           add_task(task)
-        case "2":
-            task = input("Choose one to remove: ")
-            remove_task(task)
-        case "3":
-            task_list()
-        case "4":
-            print("Exiting.... See ya!")
-            break
-        case _:
-            print("Invalid option, try again!!")
+#Initial setup
+root = tk.Tk()
+root.title("ToDo List")
+
+#Frame to hold input of tasks and buttons
+frame = tk.Frame(root)
+frame.pack(pady=10)
+
+#Listbox to show tasks
+listbox_tasks = tk.Listbox(
+    frame,
+    width=50,
+    height=10,
+    selectmode=tk.SINGLE
+)
+listbox_tasks.pack(side=tk.LEFT, fill=tk.BOTH)
+
+#Scrollbar to the listbox
+scrollbar = tk.Scrollbar(frame)
+scrollbar.pack(side=tk.RIGHT, fill=tk.BOTH)
+
+listbox_tasks.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=listbox_tasks.yview)
+
+#Input of text to add tasks
+entry_task = tk.Entry(root, width=50)
+entry_task.pack(pady=10)
+
+#Buttons
+button_add_task = tk.Button(
+    root,
+    text="Add Task",
+    width=48,
+    command=add_task
+)
+button_add_task.pack(pady=5)
+
+button_remove_task =tk.Button(
+    root,
+    text="Remove Task",
+    width=48,
+    command=remove_task
+)
+button_remove_task.pack(pady=5)
+
+button_clear_all_tasks = tk.Button(
+    root,
+    text="Remove All Tasks",
+    width=48,
+    command=clear_all_tasks
+)
+button_clear_all_tasks.pack(pady=5)
+
+#Load taks at the begining
+load_tasks()
+load_tasks_to_listbox()
+
+#Main loop of the graphic inteface
+root.mainloop()
