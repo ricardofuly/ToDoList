@@ -1,6 +1,6 @@
 ### ToDo List App
 
-Uma aplicação de lista de tarefas (ToDo List) com uma interface gráfica simples, construída com [Nome da Tecnologia/Framework]. Este projeto tem como objetivo fornecer uma maneira intuitiva de gerenciar suas tarefas diárias.
+Uma aplicação de lista de tarefas (ToDo List) com uma interface gráfica simples, construída com Python usando Tkinter para UI. Este projeto tem como objetivo fornecer uma maneira intuitiva de gerenciar suas tarefas diárias.
 
 ## Requisitos
 
